@@ -11,12 +11,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { JwtInterceptorService } from './jwt-interceptor.service';
 import { JwtUnAuthorizedInterceptorService } from './jwt-un-authorized-interceptor.service';
 import { SignUpComponent } from './sign-up/sign-up.component';
+import { TasksComponent } from './tasks/tasks.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     SignUpComponent,
+    TasksComponent,
   ],
   imports: [
     BrowserModule,
