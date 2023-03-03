@@ -49,7 +49,8 @@ export class LoginService {
   }
 
   getUserByEmail(Email:string):Observable<any>{
-    return this.httpClient.get<any>("/api/getUserByEmail/"+Email,{responseType:"json"});
+    this.httpClient = new HttpClient(this.httpBackend);
+    return this.httpClient.get<any>("/api/getUserByEmail/"+ Email,{responseType:"json"});
   }
 
   public Logout() {

@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, Query, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ProjectsService } from "../../projects.service";
 import { Project } from '../../project';
 import { ClientLocation } from '../../client-location';
 import { ClientLocationsService } from '../../client-locations.service';
 import { NgForm } from '@angular/forms';
 import * as $ from "jquery";
+import { ProjectComponent } from '../project/project.component';
 
 @Component({
   selector: 'app-projects',
@@ -43,6 +44,17 @@ export class ProjectsComponent implements OnInit {
         this.clientLocations = response;
       }
     );
+  }
+
+  isAllChecked: boolean = false;
+
+  @ViewChildren("prj") projs: QueryList<ProjectComponent> | any = null;
+
+  isAllCheckedChange(event: any) {
+    let proj = this.projs.toArray();
+    for (let i = 0; i < proj.length; i++) {
+      proj[i].isAllCheckedChange(this.isAllChecked);
+    }
   }
 
   onNewClick(event: any) {
@@ -97,7 +109,7 @@ export class ProjectsComponent implements OnInit {
       this.editProject.status = this.projects[index].status;
       this.editIndex = index;
 
-    }, 200);
+    }, 100);
   }
 
   onUpdateClick() {
@@ -160,5 +172,9 @@ export class ProjectsComponent implements OnInit {
       (error) => {
         console.log(error);
       });
+  }
+
+  onHideShowDetails(event: any) {
+    this.projectsService.toggleDetails();
   }
 }

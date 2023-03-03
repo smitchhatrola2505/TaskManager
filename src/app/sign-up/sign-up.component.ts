@@ -37,7 +37,8 @@ export class SignUpComponent implements OnInit {
         lastName: [null, [Validators.required, Validators.minLength(2)]],
       }),
 
-      email: [null, [Validators.required, Validators.email]],
+      email: [null, [Validators.required, Validators.email],
+    [this.customValidatorsService.DuplicateEmailValidator()],{updateOn:'blur'}],
       mobile: [null, [Validators.required, Validators.pattern(/^[789]\d{9}$/)]],
       dateOfBirth: [null, [Validators.required, this.customValidatorsService.minimumAgeValidator(18)]],
       password: [null, [Validators.required]],
