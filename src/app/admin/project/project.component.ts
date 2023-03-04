@@ -1,4 +1,4 @@
-import { Component, ContentChild, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, ContentChild, EventEmitter, Input, OnInit, Output, SimpleChange } from '@angular/core';
 import { Project } from 'src/app/project';
 import { ProjectsService } from 'src/app/projects.service';
 import { CheckBoxPrinterComponent } from '../check-box-printer/check-box-printer.component';
@@ -20,6 +20,20 @@ export class ProjectComponent implements OnInit {
   hideDetails: boolean = false;
 
   constructor(public projectService: ProjectsService) { }
+
+  ngOnChanges(simpleChanges:SimpleChange | any)
+  {
+    console.info("-----NgOnChange Called!!");
+
+    for(let propName in simpleChanges){
+      let chng = simpleChanges[propName] ;
+      let cur = JSON.stringify(chng.currentValue);
+      let prev = JSON.stringify(chng.previousValue);
+      console.log(`${propName}:currentValue=${cur},
+      previousValue=${prev}`);
+    }
+
+  }
 
   ngOnInit(): void {
     this.projectService.MyObservable.subscribe((hide: any) => {
