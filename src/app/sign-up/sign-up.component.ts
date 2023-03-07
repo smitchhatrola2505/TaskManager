@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormArray, FormBuilder, Validators } from '@angular/forms';
-import { CountriesService } from '../countries.service';
+import { CountriesService } from '../Services/countries.service';
 import { Country } from '../country';
 
-import { LoginService } from '../login.service';
+import { LoginService } from '../Services/login.service';
 import { Router } from '@angular/router';
-import { CustomeValidatoreService } from '../custome-validatore.service';
+import { CustomeValidatoreService } from '../Services/custome-validatore.service';
 import { SignUpViewModel } from '../sign-up-view-model';
 
 @Component({
@@ -19,15 +19,13 @@ export class SignUpComponent implements OnInit {
   countries: Country[] = [];
   registerError: string | null = null;
 
-  constructor(private countriesService: CountriesService,
-    private formBuilder: FormBuilder,
-    private customValidatorsService: CustomeValidatoreService, 
-    private loginService: LoginService, private router: Router) {
+  canLeave: boolean = true;
+
+  constructor(private countriesService: CountriesService, private formBuilder: FormBuilder, private customValidatorsService: CustomeValidatoreService, private loginService: LoginService, private router: Router) {
   }
 
   ngOnInit() {
-
-    this.countriesService.getCountries().subscribe((response)=>{
+    this.countriesService.getCountries().subscribe((response) => {
       this.countries = response;
     });
 
@@ -37,26 +35,26 @@ export class SignUpComponent implements OnInit {
         lastName: [null, [Validators.required, Validators.minLength(2)]],
       }),
 
-      email: [null, [Validators.required, Validators.email],
-    [this.customValidatorsService.DuplicateEmailValidator()],{updateOn:'blur'}],
+      email: [null, [Validators.required, Validators.email], [this.customValidatorsService.DuplicateEmailValidator()], { updateOn: 'blur' }],
       mobile: [null, [Validators.required, Validators.pattern(/^[789]\d{9}$/)]],
       dateOfBirth: [null, [Validators.required, this.customValidatorsService.minimumAgeValidator(18)]],
       password: [null, [Validators.required]],
       confirmPassword: [null, [Validators.required]],
       gender: [null, [Validators.required]],
-      countryID: [null,[Validators.required]],
+      countryID: [null, [Validators.required]],
       receiveNewsLetters: [null],
       skills: this.formBuilder.array([])
-    }, {
-      validators: [
-        this.customValidatorsService.compareValidator("confirmPassword", "password")
-      ]
-    });
+    },
+      {
+        validators: [
+          this.customValidatorsService.compareValidator("confirmPassword", "password")
+        ]
+      });
 
     this.signUpForm.valueChanges.subscribe((value: any) => {
       //console.log(value);
+      this.canLeave = false;
     });
-
   }
 
   onSubmitClick() {
@@ -64,17 +62,19 @@ export class SignUpComponent implements OnInit {
     this.signUpForm["submitted"] = true;
     console.log(this.signUpForm);
 
-    if(this.signUpForm.valid)
-    {
-      var signUpViewModel = this.signUpForm.value as SignUpViewModel;
-      this.loginService.Register(signUpViewModel).subscribe((response)=>{
-        this.router.navigate(["tasks"]);
-      },
-      (error)=>{
-        console.log(error);
-        this.registerError = "Unable to submit";
-      });
+    if (this.signUpForm.valid) {
+      var signUpVieModel = this.signUpForm.value as SignUpViewModel;
+      this.loginService.Register(signUpVieModel).subscribe(
+        (response) => {
+          this.canLeave = true;
+          this.router.navigate(["/employee", "tasks"]);
+        },
+        (error) => {
+          console.log(error);
+          this.registerError = "Unable to submit";
+        });
     }
+
     //setValue
     // this.signUpForm.setValue({
     //   firstName: "Adam",

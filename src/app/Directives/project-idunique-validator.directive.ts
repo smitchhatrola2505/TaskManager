@@ -1,9 +1,9 @@
 import { Directive } from '@angular/core';
 import { NG_ASYNC_VALIDATORS, AsyncValidator, AbstractControl, ValidationErrors } from '@angular/forms';
-import { ProjectsService } from './projects.service';
+import { ProjectsService } from '../Services/projects.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Project } from './project';
+import { Project } from '../project';
 
 @Directive({
   selector: '[appProjectIDUniqueValidator]',

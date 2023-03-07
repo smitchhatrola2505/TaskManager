@@ -1,11 +1,12 @@
 import { Component, OnInit, Query, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ProjectsService } from "../../projects.service";
+import { ProjectsService } from "../../Services/projects.service";
 import { Project } from '../../project';
 import { ClientLocation } from '../../client-location';
-import { ClientLocationsService } from '../../client-locations.service';
+import { ClientLocationsService } from '../../Services/client-locations.service';
 import { NgForm } from '@angular/forms';
 import * as $ from "jquery";
 import { ProjectComponent } from '../project/project.component';
+import { FilterPipe } from 'src/app/filter.pipe';
 
 @Component({
   selector: 'app-projects',
@@ -13,17 +14,20 @@ import { ProjectComponent } from '../project/project.component';
   styleUrls: ['./projects.component.scss']
 })
 export class ProjectsComponent implements OnInit {
+
   projects: Project[] = [];
   clientLocations: ClientLocation[] = [];
   showLoading: boolean = true;
-
   newProject: Project = new Project();
   editProject: Project = new Project();
   editIndex: any = null;
   deleteProject: Project = new Project();
   deleteIndex: any = null;
-  searchBy: string = "ProjectName";
+  searchBy: string = "projectName";
   searchText: string = "";
+  currentPageIndex:number=0;
+  pages:any[]=[];
+  pageSize:number=3;
 
   @ViewChild("newForm") newForm: NgForm | any = null;
   @ViewChild("editForm") editForm: NgForm | any = null;
@@ -44,6 +48,21 @@ export class ProjectsComponent implements OnInit {
         this.clientLocations = response;
       }
     );
+  }
+
+  calculateNoOfPages()
+  {
+    let filterPipe = new FilterPipe();
+    var resultProjects = filterPipe.transform(this.projects, this.searchBy, this.searchText);
+    var noOfPages = Math.ceil(resultProjects.length  / this.pageSize);
+
+    this.pages = [];
+    for (let i = 0; i < noOfPages; i++)
+    {
+      this.pages.push( { pageIndex: i });
+    }
+
+    this.currentPageIndex = 0;
   }
 
   isAllChecked: boolean = false;
@@ -164,17 +183,33 @@ export class ProjectsComponent implements OnInit {
       });
   }
 
-  onSearchClick() {
-    this.projectsService.SearchProjects(this.searchBy, this.searchText).subscribe(
-      (response: Project[]) => {
-        this.projects = response;
-      },
-      (error) => {
-        console.log(error);
-      });
+  
+  
+  onSearchClick()
+  {
+    // this.projectsService.SearchProjects(this.searchBy, this.searchText).subscribe(
+    //   (response: Project[]) =>
+    //   {
+    //     this.projects = response;
+    //   },
+    //   (error) => 
+    //   {
+    //     console.log(error);
+    //   });
   }
 
-  onHideShowDetails(event: any) {
+  onSearchTextKeyup(event: any)
+  {
+    this.calculateNoOfPages();
+  }
+
+  onHideShowDetails(event: any)
+  {
     this.projectsService.toggleDetails();
+  }
+
+  onPageIndexClicked(pageIndex: number)
+  {
+    this.currentPageIndex = pageIndex;
   }
 }

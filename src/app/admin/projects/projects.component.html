@@ -14,7 +14,8 @@
       <button class="btn btn-secondary" (click)="onHideShowDetails($event)">Hide/Show Details</button>
 
       <div class="col-1 custom-control custom-checkbox">
-        <input type="checkbox" value="true" name="isAllChecked" id="isAllChecked" [(ngModel)]="isAllChecked" class="custom-control-input" (change)="isAllCheckedChange($event)">
+        <input type="checkbox" value="true" name="isAllChecked" id="isAllChecked" [(ngModel)]="isAllChecked"
+          class="custom-control-input" (change)="isAllCheckedChange($event)">
         <label class="custom-control-label" for="isAllChecked"></label>
       </div>
 
@@ -33,10 +34,11 @@
 
       <div class="col-4">
         <div class="input-group">
-          <input type="text" class="form-control" id="txtSearchText" name="SearchText" [(ngModel)]="searchText">
-          <div class="input-group-append" (click)="onSearchClick()">
+          <input type="text" class="form-control" id="txtSearchText" name="SearchText" [(ngModel)]="searchText"
+            (keyup)="onSearchTextKeyup($event)">
+          <!-- <div class="input-group-append" (click)="onSearchClick()">
             <span class="input-group-text"><i class="fa fa-search"></i></span>
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -46,17 +48,31 @@
   <div class="col-xl-9 mx-auto">
     <div class="row">
 
-      <div class="col-md-4" *ngFor="let project of projects; let i = index">
+      <div class="col-md-4" *ngFor="let project of projects
+       | filter:searchBy:searchText | paging:currentPageIndex:pageSize; let i = index">
+
         <app-project #prj [currentProject]="project" [recordIndex]="i" (editClick)="onEditClick($event, i)"
           (deleteClick)="onDeleteClick($event, i)">
-        <app-check-box-printer #selectionBox></app-check-box-printer>
+          <app-check-box-printer #selectionBox></app-check-box-printer>
         </app-project>
-
-
       </div>
     </div>
-  </div>
 
+    <div class="row">
+      <div class="col-12">
+        <ul class="pagination justify-content-center mt-1">
+
+          <li class="page-item" *ngFor="let page of pages" (click)="onPageIndexClicked(page.pageIndex)"
+            [ngClass]=" { 'active': page.pageIndex == currentPageIndex}">
+            <a href="#" onclick="return false" class="page-link">
+              {{page.pageIndex + 1}}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <form #newForm="ngForm" novalidate="novalidate" appClientLocationStatusValidator>

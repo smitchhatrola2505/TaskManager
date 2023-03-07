@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Observable, Observer } from 'rxjs';
-import { Project } from './project';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Project } from '../project';
 import { map } from "rxjs/operators";
 
 @Injectable({
@@ -10,28 +10,18 @@ import { map } from "rxjs/operators";
 export class ProjectsService
 {
   urlPrefix: string = ""; //make this as empty ("") if you are using asp.net core [without CORS]
-
-  public MyObservable:Observable<boolean>|any;
-  private MyObservers:Observer<boolean>[]=[];
+  public MySubject: BehaviorSubject<boolean>;
 
   constructor(private httpClient: HttpClient)
   {
-    this.MyObservable=Observable.create((observer:Observer<boolean>)=>{
-      this.MyObservers.push(observer);
-    });
+    this.MySubject = new BehaviorSubject<boolean>(false);
   }
 
- hideDetails:boolean = false;
-
- toggleDetails()
+  toggleDetails()
   {
-    this.hideDetails = !this.hideDetails;
-    for(let i=0;i<this.MyObservers.length;i++)
-    {
-      this.MyObservers[i].next(this.hideDetails);
-    }
+    this.MySubject.next(!this.MySubject.value);
   }
-  
+
   getAllProjects(): Observable<Project[]>
   {
     return this.httpClient.get<Project[]>(this.urlPrefix + "/api/projects", { responseType: "json" })
@@ -51,12 +41,13 @@ export class ProjectsService
   {
     return this.httpClient.get<Project>(this.urlPrefix + "/api/projects/searchbyprojectid/" + ProjectID, { responseType: "json" });
   }
-  
+
   insertProject(newProject: Project): Observable<Project>
   {
+    debugger;
     var requestHeaders = new HttpHeaders();
     requestHeaders = requestHeaders.set("X-XSRF-TOKEN", sessionStorage['XSRFRequestToken']);
-    return this.httpClient.post<Project>(this.urlPrefix + "/api/projects", newProject, { headers: requestHeaders, responseType: "json" });
+    return this.httpClient.post<Project>("/api/projects", newProject, { headers: requestHeaders, responseType: "json" });
   }
 
   updateProject(existingProject: Project): Observable<Project>
@@ -73,9 +64,4 @@ export class ProjectsService
   {
     return this.httpClient.get<Project[]>(this.urlPrefix + "/api/projects/search/" + searchBy + "/" + searchText, { responseType: "json" });
   }
-
- 
 }
-
-
-

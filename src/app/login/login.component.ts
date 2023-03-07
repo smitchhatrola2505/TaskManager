@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LoginViewModel } from '../login-view-model';
-import { LoginService } from '../login.service';
+import { LoginService } from '../Services/login.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -21,15 +21,12 @@ export class LoginComponent implements OnInit
   {
   }
 
-  onLoginClick(event: any)
-  {
+  onLoginClick(event: any) {
     this.loginService.Login(this.loginViewModel).subscribe(
-      (response) =>
-      {
-        this.router.navigateByUrl("/dashboard");
+      (response) => {
+        this.router.navigate(["/admin", "dashboard"]);
       },
-      (error) =>
-      {
+      (error) => {
         console.log(error);
         this.loginError = "Invalid Username or Password";
       },
